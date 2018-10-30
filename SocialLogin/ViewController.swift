@@ -16,29 +16,30 @@ class ViewController: UIViewController, FBSDKLoginButtonDelegate {
     
     var myInfo: Array = [String]()
     
+    override func viewWillAppear(_ animated: Bool) {
+        
+         print(FBSDKAccessToken.current())
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         print("In view did load")
-        
+       
         //used for programatically creating login button
         /*
                  let loginButton = FBSDKLoginButton()
                  view.addSubview(loginButton)
                  loginButton.frame = CGRect(x: 16, y: 50, width: view.frame.width - 32, height: 50  )
-         
          */
         
         loginButton.delegate  = self
         loginButton.readPermissions = ["email", "public_profile"]
         
-        // Do any additional setup after loading the view, typically from a nib.
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
     
     
     func loginButtonDidLogOut(_ loginButton: FBSDKLoginButton!) {
@@ -88,6 +89,7 @@ class ViewController: UIViewController, FBSDKLoginButtonDelegate {
         myInfo.name = name
         myInfo.email = email
         myInfo.imgUrl = imgUrl
+        
         let storyBoard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         let newVC = storyBoard.instantiateViewController(withIdentifier: "MyDetailsViewController") as! MyDetailsViewController
         // self.present(newViewController, animated: true, completion: nil)

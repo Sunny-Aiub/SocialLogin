@@ -7,7 +7,7 @@
 //
 
 import UIKit
-
+import FBSDKLoginKit
 class MyDetailsViewController: UIViewController {
     
     @IBOutlet weak var lblName: UILabel!
@@ -35,7 +35,21 @@ class MyDetailsViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    @IBAction func btnLogOutAction(_ sender: Any) {
+        
+        let loginManager = FBSDKLoginManager()
+        loginManager.logOut()
+        
+        if let nav = self.navigationController {
+            nav.popViewController(animated: true)
+        } else {
+            self.dismiss(animated: true, completion: nil)
+        }
+        
+    }
+    
     @IBAction func backTPreviousController(_ sender: Any) {
+        
         if let nav = self.navigationController {
             nav.popViewController(animated: true)
         } else {
@@ -50,7 +64,7 @@ class MyDetailsViewController: UIViewController {
             if let data = NSData(contentsOf: url as URL){
                 self.myImgView.image = UIImage(data: data as Data)
             }
-            }
+        }
 
     }
 }
