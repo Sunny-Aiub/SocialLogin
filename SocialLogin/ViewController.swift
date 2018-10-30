@@ -8,9 +8,10 @@
 
 import UIKit
 import FBSDKLoginKit
+import Firebase
+import GoogleSignIn
 
-
-class ViewController: UIViewController, FBSDKLoginButtonDelegate {
+class ViewController: UIViewController, FBSDKLoginButtonDelegate, GIDSignInUIDelegate {
     
     @IBOutlet weak var loginButton: FBSDKLoginButton!
     
@@ -20,20 +21,20 @@ class ViewController: UIViewController, FBSDKLoginButtonDelegate {
         
          print(FBSDKAccessToken.current())
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         print("In view did load")
-       
-        //used for programatically creating login button
-        /*
-                 let loginButton = FBSDKLoginButton()
-                 view.addSubview(loginButton)
-                 loginButton.frame = CGRect(x: 16, y: 50, width: view.frame.width - 32, height: 50  )
-         */
-        
+        //createSignInButtonForFacebook()
         loginButton.delegate  = self
         loginButton.readPermissions = ["email", "public_profile"]
         
+        //create Sign In Button for Google
+        createSignInButtonForGoogle()
+        
+        GIDSignIn.sharedInstance().uiDelegate = self
+        
+
     }
     
     override func didReceiveMemoryWarning() {
@@ -41,6 +42,14 @@ class ViewController: UIViewController, FBSDKLoginButtonDelegate {
         // Dispose of any resources that can be recreated.
     }
     
+    func createSignInButtonForGoogle() {
+        
+        let googleButton = GIDSignInButton()
+        googleButton.frame = CGRect(x: loginButton.frame.origin.x + 16, y: loginButton.frame.origin.y + 40, width: loginButton.frame.width, height: loginButton.frame.height)
+       
+        view.addSubview(googleButton)
+        
+    }
     
     func loginButtonDidLogOut(_ loginButton: FBSDKLoginButton!) {
         
@@ -61,6 +70,9 @@ class ViewController: UIViewController, FBSDKLoginButtonDelegate {
     
     func showDetails()  {
         
+        self.firebaseAuthenticationUsingFbLogin()
+        
+        //for fetching fb details
         FBSDKGraphRequest(graphPath: "/me", parameters: ["fields": "id, name, email, picture.type(large)"]).start{
             (connection, result, err) in
             if err != nil {
@@ -73,6 +85,34 @@ class ViewController: UIViewController, FBSDKLoginButtonDelegate {
             print(dict)
             self.goToAnotherView(dict: dict)
            
+        }
+    }
+    
+    
+    // for Firebase Authentication with Facebook
+    func firebaseAuthenticationUsingFbLogin()  {
+        
+        let accessToken = FBSDKAccessToken.current()
+        guard let accessTokenString = accessToken?.tokenString else { return }
+        
+        let credentials = FacebookAuthProvider.credential(withAccessToken:accessTokenString)
+        
+        Auth.auth().signInAndRetrieveData(with: credentials) { (user, error) in
+            if error != nil {
+                print("Oopps! Invalid Fb User;", error!)
+                return
+            }
+            print("Login Successfull with User:", user!)
+            
+            let user = Auth.auth().currentUser
+            if let user = user {
+                let uid = user.uid
+                let email = user.email
+                let photoURL = user.photoURL
+                print("Firebase User EMail:", email! )
+                print(uid)
+                print(photoURL!)
+            }
         }
     }
     
@@ -96,6 +136,13 @@ class ViewController: UIViewController, FBSDKLoginButtonDelegate {
         newVC.detailsInfo = myInfo
         //self.navigationController?.pushViewController(newVC, animated: true)
         self.present(newVC, animated: true, completion: nil)
+    }
+    
+    func createSignInButtonForFacebook() {
+        //used for programatically creating login button
+         let loginButton = FBSDKLoginButton()
+         view.addSubview(loginButton)
+         loginButton.frame = CGRect(x: 16, y: 50, width: view.frame.width - 32, height: 50  )
     }
     
 }
