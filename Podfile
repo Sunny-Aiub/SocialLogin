@@ -11,8 +11,9 @@ target 'SocialLogin' do
 	pod ‘FBSDKCoreKit’
 	pod ‘FBSDKShareKit’
    	pod ‘FBSDKLoginKit’
-    	pod ‘Firebase/Auth’
-    	pod 'GoogleSignIn'
+    pod ‘Firebase/Auth’
+    pod ‘GoogleSignIn’
+    	
 
 
 end
